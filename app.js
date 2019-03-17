@@ -12,6 +12,8 @@ const expressValidator = require('express-validator');
 const routes = require('./routes/index');
 const helpers = require('./helpers');
 const errorHandlers = require('./handlers/errorHandlers');
+// Invokes the code that lives inside of handlers/passport js
+require('./handlers/passport');
 
 // create our Express app
 const app = express();
