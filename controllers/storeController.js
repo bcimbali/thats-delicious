@@ -134,6 +134,10 @@ exports.mapStores = async (req, res) => {
     }
   };
   // Use our query to find our stores and only select the fiels passed in. limit to 10 results.
-  const stores = await Store.find(q).select('slug name description location').limit(10);
+  const stores = await Store.find(q).select('slug name description location photo').limit(10);
   res.json(stores);
+};
+
+exports.mapPage = (req, res) => {
+  res.render('map', { title: 'Map' });
 };
