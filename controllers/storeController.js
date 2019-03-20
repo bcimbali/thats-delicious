@@ -117,3 +117,23 @@ exports.searchStores = async (req, res) => {
   .limit(5);
   res.json(stores);
 };
+
+exports.mapStores = async (req, res) => {
+  // MongoDB expects us to pass it an array of lat & lng numbers
+  // Then, map over the array and use parseFloat to turn them all into numbers
+  const coordinates = [req.query.lng, req.query.lat].map(parseFloat);
+  const q = {
+    location: {
+      $near: {
+        $geometry: {
+          type: 'Point',
+          coordinates
+        },
+        $maxDistance: 10000 //10km
+      }
+    }
+  };
+  // Use our query to find our stores and only select the fiels passed in. limit to 10 results.
+  const stores = await Store.find(q).select('slug name description location').limit(10);
+  res.json(stores);
+};
