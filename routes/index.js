@@ -57,6 +57,8 @@ router.post('/account/reset/:token',
 );
 
 router.get('/map', storeController.mapPage);
+// Add the middleware (isLoggedIn) to see if user is logged in before we display hearted stores
+router.get('/hearts', authController.isLoggedIn, catchErrors(storeController.getHearts));
 
 /**
  * API
