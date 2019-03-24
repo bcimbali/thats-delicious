@@ -163,3 +163,11 @@ exports.getHearts = async (req, res) => {
   });
   res.render('stores', { title: 'Hearted Stores', stores });
 };
+
+exports.getTopStores = async (req, res) => {
+  /** Generally it's a good idea to place complex queries in your model.
+   * If I was to do a .find() or something similar, that would be fine here.
+   */
+  const stores = await Store.getTopStores();
+  res.render('topStores', { stores, title: '\u2605 Top Stores!' });
+};

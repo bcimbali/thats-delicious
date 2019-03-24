@@ -75,13 +75,45 @@ storeSchema.pre('save', async function(next) {
   // TODO make more resilient so slugs are unique
 });
 
-// Need to use an old type declaration of function because this is 
+// Need to use an old type declaration of function because THIS is 
 // going to be bound to our model
 storeSchema.statics.getTagsList = function() {
   return this.aggregate([
     { $unwind: '$tags'},
     { $group: { _id: '$tags', count: { $sum: 1 } } },
     { $sort: { count: -1 } }
+  ]);
+};
+
+storeSchema.statics.getTopStores = function() {
+  // Aggregate is a query function like .find() but you can do much more
+  // complex stuff inside of it. By returning this, it returns the promise.
+  return this.aggregate([
+    // Lookup stores and populate their reviews
+    { $lookup: {from: 'reviews', 
+      localField: '_id', 
+      foreignField: 'store', 
+      as: 'reviews'}},
+    // filter for only items that have 2 or more reviews
+    // MongoDB is index based so it searches for stores that have 2 or 
+    // more entries. (e.g. the 'reviews.1`)
+    { $match: { 'reviews.1': { $exists: true } } },
+    // Add the average reviews field
+    // Creating a new field called 'averageRating'
+    // $project adds a field but doesn't bring the others with it
+    // so you need to tell them in explicitly
+    { $project: {
+      // $$ROOT is equal to the original document
+      photo: '$$ROOT.photo',
+      name: '$$ROOT.name',
+      reviews: '$$ROOT.reviews',
+      slug: '$$ROOT.slug',
+      averageRating: { $avg: '$reviews.rating' }
+    }},
+    // Sort it by our new field, highest reviews first
+    { $sort: { averageRating: -1 } },
+    // limit to at most 10
+    { $limit: 10 }
   ]);
 };
 
@@ -94,5 +126,13 @@ storeSchema.virtual('reviews', {
   localField: '_id', // Which field on our store?
   foreignField: 'store' // Which field on the review?
 });
+
+function autopopulate(next) {
+  this.populate('reviews');
+  next();
+;}
+
+storeSchema.pre('find', autopopulate);
+storeSchema.pre('findOne', autopopulate);
 
 module.exports = mongoose.model('Store', storeSchema);
