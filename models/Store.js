@@ -38,6 +38,11 @@ const storeSchema = new mongoose.Schema({
     ref: 'User',
     required: 'You must supply an author'
   }
+}, {
+  // Anytime a document is converted to either an object or JSON
+  // it will bring our virtuals along for the ride
+  toJSON: { virtuals: true },
+  toObject: { virtuals: true }
 });
 
 // Define our indexes
@@ -78,6 +83,16 @@ storeSchema.statics.getTagsList = function() {
     { $group: { _id: '$tags', count: { $sum: 1 } } },
     { $sort: { count: -1 } }
   ]);
-}
+};
+
+// Find reviews where the stores _id property === reviews store property
+// (kind of like a join in SQL)
+/** Important thing to note - Virtual fields don't actually go 
+ * into an object or json unless you explicitly ask for it */
+storeSchema.virtual('reviews', {
+  ref: 'Review', // What model to link?
+  localField: '_id', // Which field on our store?
+  foreignField: 'store' // Which field on the review?
+});
 
 module.exports = mongoose.model('Store', storeSchema);
