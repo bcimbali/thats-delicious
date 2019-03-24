@@ -1,0 +1,5 @@
+{
+  "name": "thats-delicious",
+  "version": "0.0.1",
+  "builds": [{ "src": "./start.js", "use": "@now/node" }]
+}
