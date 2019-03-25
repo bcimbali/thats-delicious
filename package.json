@@ -2,6 +2,7 @@
   "name": "thats-delicious",
   "version": "0.0.1",
   "private": true,
+  "main": "start.js",
   "engines": {
     "node": ">= 7.6.0"
   },
