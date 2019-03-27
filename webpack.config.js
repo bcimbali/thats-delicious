@@ -17,7 +17,7 @@ const javascript = {
   test: /\.(js)$/, // see how we match anything that ends in `.js`? Cool
   use: [{
     loader: 'babel-loader',
-    options: { presets: ['env'] } // this is one way of passing options
+    options: { presets: ['@babel/preset-env'] } // this is one way of passing options
   }],
 };
 
